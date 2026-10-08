@@ -1,0 +1,49 @@
+The following vehicle photographs are from Wikimedia Commons. The linked
+Commons file pages identify each photograph's original creator and license.
+Keep this attribution list with the corresponding images when redistributing
+the showroom assets.
+
+porsche-taycan.jpg
+https://commons.wikimedia.org/wiki/File:2020_Porsche_Taycan_4S_79kWh_Front.jpg
+
+mercedes-g-class.jpg
+https://commons.wikimedia.org/wiki/File:Mercedes-Benz_W463_G_350_BlueTEC_01.jpg
+
+bmw-m4.jpg
+https://commons.wikimedia.org/wiki/File:2021_BMW_M4_Competition_Automatic_3.0_Front.jpg
+
+audi-r8.jpg
+https://commons.wikimedia.org/wiki/File:2018_Audi_R8_Coupe_V10_plus_Front.jpg
+
+lamborghini-huracan.jpg
+https://commons.wikimedia.org/wiki/File:2017_Lamborghini_Huracan_LP610.jpg
+
+ferrari-f8-tributo.jpg
+https://commons.wikimedia.org/wiki/File:2020_Ferrari_F8_Tributo_3.9.jpg
+
+bentley-continental-gt.jpg
+https://commons.wikimedia.org/wiki/File:Bentley_Continental_GT_First_Edition_(49919050697)_(cropped)_(cropped).jpg
+
+rolls-royce-cullinan.jpg
+https://commons.wikimedia.org/wiki/File:2019_Rolls-Royce_Cullinan_V12_Automatic_6.75_Front.jpg
+
+toyota-gr-supra.png
+https://commons.wikimedia.org/wiki/File:2020_Toyota_GR_Supra_(United_States).png
+
+honda-civic-type-r.jpg
+https://commons.wikimedia.org/wiki/File:2024_Honda_Civic_Type_R,_front_right,_06-15-2024.jpg
+
+porsche-cayenne.jpg
+https://commons.wikimedia.org/wiki/File:Porsche_Cayenne_(III,_Facelift)_–_f_01012025.jpg
+
+mercedes-s-class.jpg
+https://commons.wikimedia.org/wiki/File:Mercedes-Benz_W223_IMG_6663.jpg
+
+bmw-x7.jpg
+https://commons.wikimedia.org/wiki/File:BMW_G07_1X7A1696.jpg
+
+lamborghini-urus.jpg
+https://commons.wikimedia.org/wiki/File:Lamborghini_Urus_SE_DSC_8524.jpg
+
+ferrari-roma.jpg
+https://commons.wikimedia.org/wiki/File:2021_Ferrari_Roma_in_Rosso_Fiorano,_front_right.jpg
