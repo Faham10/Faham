@@ -76,7 +76,7 @@ router.post("/messages/:id/reply", validate(replySchema), asyncHandler(async (re
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          from: env.SMTP_FROM,
+          from: "AURALUXE MOTORS <onboarding@resend.dev>",
           to: message.email,
           reply_to: env.SMTP_FROM,
           subject: `Re: ${message.subject}`,
