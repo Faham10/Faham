@@ -1,5 +1,4 @@
 import { Router } from "express";
-import nodemailer from "nodemailer";
 import { env } from "../config/env.js";
 import { requireAdmin } from "../middleware/auth.js";
 import { asyncHandler } from "../middleware/asyncHandler.js";
@@ -43,15 +42,16 @@ router.post("/messages/:id/reply", validate(replySchema), asyncHandler(async (re
   const routeStartedAt = Date.now();
   const timings = {
     databaseLookupMs: null,
-    smtpSendMs: null,
+    emailSendMs: null,
     databaseSaveMs: null
   };
   let outcome = "error";
 
   try {
-    if (!env.SMTP_HOST || !env.SMTP_USER || !env.SMTP_PASS || !env.SMTP_FROM) {
-      outcome = "smtp_not_configured";
-      return response.status(503).json({ error: "Configure SMTP settings before sending replies." });
+    const resendApiKey = process.env.RESEND_API_KEY;
+    if (!resendApiKey || !env.SMTP_FROM) {
+      outcome = "resend_not_configured";
+      return response.status(503).json({ error: "Configure Resend and sender settings before sending replies." });
     }
 
     const lookupStartedAt = Date.now();
@@ -66,27 +66,33 @@ router.post("/messages/:id/reply", validate(replySchema), asyncHandler(async (re
       return response.status(404).json({ error: "Enquiry not found." });
     }
 
-    const transporter = nodemailer.createTransport({
-      host: env.SMTP_HOST,
-      port: env.SMTP_PORT,
-      secure: env.SMTP_SECURE === "true",
-      auth: { user: env.SMTP_USER, pass: env.SMTP_PASS },
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 30000
-    });
-
-    const smtpStartedAt = Date.now();
+    const emailStartedAt = Date.now();
+    let resendResponse;
     try {
-      await transporter.sendMail({
-        from: env.SMTP_FROM,
-        to: message.email,
-        replyTo: env.SMTP_FROM,
-        subject: `Re: ${message.subject}`,
-        text: `Hello ${message.name},\n\n${request.validated.body.reply}\n\nAURALUXE MOTORS`
+      resendResponse = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${resendApiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          from: env.SMTP_FROM,
+          to: message.email,
+          reply_to: env.SMTP_FROM,
+          subject: `Re: ${message.subject}`,
+          text: `Hello ${message.name},\n\n${request.validated.body.reply}\n\nAURALUXE MOTORS`
+        }),
+        signal: AbortSignal.timeout(30000)
       });
     } finally {
-      timings.smtpSendMs = Date.now() - smtpStartedAt;
+      timings.emailSendMs = Date.now() - emailStartedAt;
+    }
+    if (!resendResponse.ok) {
+      outcome = "email_provider_rejected";
+      console.warn("admin.reply.email_provider_error", JSON.stringify({ status: resendResponse.status }));
+      return response.status(502).json({
+        error: "The email provider could not accept the reply. Check the verified sender configuration."
+      });
     }
 
     message.reply = request.validated.body.reply;
