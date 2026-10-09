@@ -40,33 +40,76 @@ router.patch("/messages/:id", validate(messageStatusSchema), asyncHandler(async 
 }));
 
 router.post("/messages/:id/reply", validate(replySchema), asyncHandler(async (request, response) => {
-  if (!env.SMTP_HOST || !env.SMTP_USER || !env.SMTP_PASS || !env.SMTP_FROM) {
-    return response.status(503).json({ error: "Configure SMTP settings before sending replies." });
+  const routeStartedAt = Date.now();
+  const timings = {
+    databaseLookupMs: null,
+    smtpSendMs: null,
+    databaseSaveMs: null
+  };
+  let outcome = "error";
+
+  try {
+    if (!env.SMTP_HOST || !env.SMTP_USER || !env.SMTP_PASS || !env.SMTP_FROM) {
+      outcome = "smtp_not_configured";
+      return response.status(503).json({ error: "Configure SMTP settings before sending replies." });
+    }
+
+    const lookupStartedAt = Date.now();
+    let message;
+    try {
+      message = await Message.findById(request.validated.params.id);
+    } finally {
+      timings.databaseLookupMs = Date.now() - lookupStartedAt;
+    }
+    if (!message) {
+      outcome = "not_found";
+      return response.status(404).json({ error: "Enquiry not found." });
+    }
+
+    const transporter = nodemailer.createTransport({
+      host: env.SMTP_HOST,
+      port: env.SMTP_PORT,
+      secure: env.SMTP_SECURE === "true",
+      auth: { user: env.SMTP_USER, pass: env.SMTP_PASS },
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 30000
+    });
+
+    const smtpStartedAt = Date.now();
+    try {
+      await transporter.sendMail({
+        from: env.SMTP_FROM,
+        to: message.email,
+        replyTo: env.SMTP_FROM,
+        subject: `Re: ${message.subject}`,
+        text: `Hello ${message.name},\n\n${request.validated.body.reply}\n\nAURALUXE MOTORS`
+      });
+    } finally {
+      timings.smtpSendMs = Date.now() - smtpStartedAt;
+    }
+
+    message.reply = request.validated.body.reply;
+    message.status = "replied";
+    message.repliedAt = new Date();
+    const saveStartedAt = Date.now();
+    try {
+      await message.save();
+    } finally {
+      timings.databaseSaveMs = Date.now() - saveStartedAt;
+    }
+    outcome = "success";
+    return response.json({ message: "Your reply has been sent.", enquiry: message });
+  } catch (error) {
+    outcome = "error";
+    throw error;
+  } finally {
+    console.info("admin.reply.timing", JSON.stringify({
+      outcome,
+      ...timings,
+      totalMs: Date.now() - routeStartedAt
+    }));
   }
-
-  const message = await Message.findById(request.validated.params.id);
-  if (!message) return response.status(404).json({ error: "Enquiry not found." });
-
-  const transporter = nodemailer.createTransport({
-    host: env.SMTP_HOST,
-    port: env.SMTP_PORT,
-    secure: env.SMTP_SECURE === "true",
-    auth: { user: env.SMTP_USER, pass: env.SMTP_PASS }
-  });
-
-  await transporter.sendMail({
-    from: env.SMTP_FROM,
-    to: message.email,
-    replyTo: env.SMTP_FROM,
-    subject: `Re: ${message.subject}`,
-    text: `Hello ${message.name},\n\n${request.validated.body.reply}\n\nAURALUXE MOTORS`
-  });
-
-  message.reply = request.validated.body.reply;
-  message.status = "replied";
-  message.repliedAt = new Date();
-  await message.save();
-  return response.json({ message: "Your reply has been sent.", enquiry: message });
 }));
 
 router.delete("/messages/:id", validate(messageIdSchema), asyncHandler(async (request, response) => {
