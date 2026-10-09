@@ -68,7 +68,7 @@ em { font-family: var(--serif); font-weight: 400; }
 .text-link:hover { gap: 15px; }
 
 /* Public showroom */
-.site-header { position: absolute; z-index: 20; top: 0; left: 0; width: 100%; border-bottom: 1px solid rgba(255,255,255,.15); color: #f2f0e9; }
+.site-header { position: fixed; z-index: 20; top: 0; left: 0; width: 100%; border-bottom: 1px solid rgba(255,255,255,.15); color: #f2f0e9; }
 .site-header-inner { width: min(1440px, calc(100% - 96px)); height: 84px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
 .brand-lockup { display: inline-flex; align-items: center; gap: 11px; min-width: max-content; }
 .brand-mark { display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid var(--gold); color: var(--gold); font: italic 24px var(--serif); }
@@ -2508,7 +2508,7 @@ em { font-family: var(--serif); font-weight: 400; }
 
 /* Auraluxe public shell */
 .legacy-site .legacy-header.site-header {
-  position: absolute;
+  position: fixed;
   top: 0;
   right: 0;
   left: 0;
