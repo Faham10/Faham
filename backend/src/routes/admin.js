@@ -79,7 +79,7 @@ router.post("/messages/:id/reply", validate(replySchema), asyncHandler(async (re
           from: "AURALUXE MOTORS <onboarding@resend.dev>",
           to: message.email,
           reply_to: env.SMTP_FROM,
-          subject: `Re: ${message.subject}`,
+          subject: message.subject.replace(/^Re: /, ""),
           text: `Hello ${message.name},\n\n${request.validated.body.reply}\n\nAURALUXE MOTORS`
         }),
         signal: AbortSignal.timeout(30000)
