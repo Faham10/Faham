@@ -5,6 +5,20 @@ import { api } from "../lib/api.js";
 import { formatDate, formatMileage, formatPrice } from "../lib/format.js";
 import { getAdminSession } from "../lib/adminSession.js";
 
+const defaultReply = `Dear Customer,
+
+Thank you for contacting AURA LUXE MOTORS and for your interest in our vehicles.
+
+We have received your enquiry and appreciate you taking the time to reach out to us. Our team will be happy to assist you with your questions and provide any additional information you may need.
+
+If you are enquiring about a specific vehicle, please feel free to share its name or model so we can assist you more effectively.
+
+Thank you for considering AURA LUXE MOTORS. We look forward to assisting you.
+
+Best regards,
+AURA LUXE MOTORS
+Customer Support Team`;
+
 export default function AdminMessagesPage() {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -79,7 +93,7 @@ export default function AdminMessagesPage() {
 
   async function openMessage(message) {
     setSelected(message);
-    setReply("");
+    setReply(defaultReply);
     if (message.status === "new") await updateStatus(message, "read");
   }
 
